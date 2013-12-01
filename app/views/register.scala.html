@@ -1,0 +1,20 @@
+@(registrationForm: Form[UserRegistrationData])
+
+@main("Sign up") {
+
+    @if(registrationForm.hasGlobalErrors) {
+        <ul>
+        @registrationForm.globalErrors.foreach { error =>
+            <li>error.message</li>
+        }
+        </ul>
+    }
+
+    @helper.form(action = routes.Security.checkSignup(), 'class -> "form-signin") {
+        <h2 class="form-signin-heading">Please sign in</h2>
+        <input name="@registrationForm("email").name" value="@registrationForm("email").value" type="text" class="form-control" placeholder="Email address" required autofocus>
+        <input name="@registrationForm("password").name" type="password" class="form-control" placeholder="Password" required>
+        <input name="@registrationForm("p2").name" type="password" class="form-control" placeholder="Repeat password" required>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign up</button>
+    }
+}

@@ -1,0 +1,20 @@
+@(loginForm: Form[UserData])
+
+@main("Login") {
+
+@if(loginForm.hasGlobalErrors) {
+    <ul>
+    @loginForm.globalErrors.foreach { error =>
+        <li>error.message</li>
+    }
+    </ul>
+}
+
+@helper.form(action = routes.Security.checkLogin(), 'class -> "form-signin") {
+  <h2 class="form-signin-heading">Please sign in</h2>
+  <input name="@loginForm("email").name" value="@loginForm("email").value" type="text" class="form-control" placeholder="Email address" required autofocus>
+  <input name="@loginForm("password").name" type="password" class="form-control" placeholder="Password" required>
+  <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+  <a href="@routes.Security.signup" class="btn btn-default btn-lg btn-block" role="button">Sign up</a>
+}
+}
