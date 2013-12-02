@@ -3,23 +3,30 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index
+GET     /                           controllers.Dashboard.index
 
 # Login
 GET     /login                      controllers.Security.login
 POST    /login                      controllers.Security.checkLogin
-GET     /logout                      controllers.Security.logout
+GET     /logout                     controllers.Security.logout
+
 # Signup
 GET     /signup                     controllers.Security.signup
 POST    /signup                     controllers.Security.checkSignup
 
+# JS routes
+GET     /routes.js                  controllers.JsRoutes.router
+
+# Docuement API
+GET     /api/document               controllers.DocumentApi.list
+POST    /api/document               controllers.DocumentApi.create
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
 
 # Obtain require.js with built-in knowledge of how webjars resources can be
 # resolved
-GET     /lib/require.js             controllers.WebJarAssets.requirejs()
+GET     /webjars/require.js             controllers.WebJarAssets.requirejs()
 
 # Enable webjar based resources to be returned
 GET     /webjars/*file              controllers.WebJarAssets.at(file)

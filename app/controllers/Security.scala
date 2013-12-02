@@ -16,6 +16,7 @@ object Security extends Controller {
       "password" -> nonEmptyText
     )(UserData.apply)(UserData.unapply)
   )
+
   def validateRegistrationForm(email: String, password: String, p2: String) = {
     if (password == p2) {
       Some(UserRegistrationData(email, password, p2))
@@ -38,7 +39,7 @@ object Security extends Controller {
   )
 
   def loginUser(user: User)(implicit request: Request[AnyContent]) = {
-    Redirect(routes.Application.index).withSession(session + ("user_id" -> user.id.toString))
+    Redirect(routes.Dashboard.index).withSession(session + ("user_id" -> user.id.toString))
   }
 
   def login = Action {
@@ -58,10 +59,8 @@ object Security extends Controller {
   }
 
   def logout = Action { implicit request =>
-    Redirect(routes.Application.index()).withSession(session - "user_id")
+    Redirect(routes.Dashboard.index()).withSession(session - "user_id")
   }
-
-
 
   def signup = Action {
     Ok(views.html.register(registrationForm))

@@ -4,6 +4,8 @@ import scala.concurrent._
 import scalikejdbc._, async._, FutureImplicits._, SQLInterpolation._
 import org.joda.time.DateTime
 import com.github.t3hnar.bcrypt._
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 
 case class User(
   id: Long,
@@ -22,6 +24,20 @@ case class User(
 
 object User extends SQLSyntaxSupport[User] with ShortenedNames {
 
+  val userReads = Json.reads[User]
+  val userWrites = new Writes[User] {
+    def writes(u: User): JsValue = {
+      Json.obj(
+        "id" -> u.id,
+        "firstName" -> u.firstName,
+        "lastName" -> u.lastName,
+        "dateJoined" -> u.dateJoined
+      )
+    }
+  }
+
+  implicit val userFormat = Format(userReads, userWrites)
+
   override val tableName = "users"
   override val columns = Seq("id", "email", "password", "salt", "first_name", "last_name", "date_joined")
   override val nameConverters = Map(
@@ -30,7 +46,7 @@ object User extends SQLSyntaxSupport[User] with ShortenedNames {
     "dateJoined" -> "date_joined"
   )
 
-  def apply(u: ResultName[User])(rs: WrappedResultSet): User = new User(
+  def fromResultSet(u: ResultName[User])(rs: WrappedResultSet): User = new User(
     id = rs.long(u.id),
     email = rs.string(u.email),
     password = rs.string(u.password),
@@ -39,7 +55,7 @@ object User extends SQLSyntaxSupport[User] with ShortenedNames {
     lastName = rs.stringOpt(u.lastName),
     dateJoined = rs.timestamp(u.dateJoined).toDateTime
   )
-  def apply(u: SyntaxProvider[User])(rs: WrappedResultSet): User = apply(u.resultName)(rs)
+  def fromResultSet(u: SyntaxProvider[User])(rs: WrappedResultSet): User = fromResultSet(u.resultName)(rs)
 
   val u = User.syntax("u")
 
@@ -48,7 +64,7 @@ object User extends SQLSyntaxSupport[User] with ShortenedNames {
     ctx: EC = ECGlobal): Future[Option[User]] = {
     withSQL {
       select.from(User as u).where.eq(u.id, id)
-    }.map(User(u)).single.future
+    }.map(User.fromResultSet(u)).single.future
   }
 
   def getByEmail(email: String)(
@@ -56,7 +72,7 @@ object User extends SQLSyntaxSupport[User] with ShortenedNames {
     ctx: EC = ECGlobal): Future[Option[User]] = {
     withSQL {
       select.from(User as u).where.eq(u.email, email)
-    }.map(User(u)).single.future
+    }.map(User.fromResultSet(u)).single.future
   }
 
   def authenticate(email: String, password: String)(
@@ -78,7 +94,7 @@ object User extends SQLSyntaxSupport[User] with ShortenedNames {
         column.salt -> salt,
         column.dateJoined -> dateJoined
       ).returningId
-    }.updateAndReturnGeneratedKey.future map {id =>
+    }.updateAndReturnGeneratedKey.future map { id =>
       new User(
         id = id,
         email = email,
