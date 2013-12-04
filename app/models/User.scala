@@ -29,6 +29,7 @@ object User extends SQLSyntaxSupport[User] with ShortenedNames {
     def writes(u: User): JsValue = {
       Json.obj(
         "id" -> u.id,
+        "email" -> u.email,
         "firstName" -> u.firstName,
         "lastName" -> u.lastName,
         "dateJoined" -> u.dateJoined
@@ -56,6 +57,10 @@ object User extends SQLSyntaxSupport[User] with ShortenedNames {
     dateJoined = rs.timestamp(u.dateJoined).toDateTime
   )
   def fromResultSet(u: SyntaxProvider[User])(rs: WrappedResultSet): User = fromResultSet(u.resultName)(rs)
+
+  def fromResultSetOpt(u: SyntaxProvider[User])(rs: WrappedResultSet): Option[User] = {
+    rs.longOpt(u.resultName.id).map(_ => User.fromResultSet(u)(rs))
+  }
 
   val u = User.syntax("u")
 

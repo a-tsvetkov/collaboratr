@@ -2,6 +2,7 @@ package controllers
 
 import play.api._
 import play.api.mvc._
+import utils.Secure
 
 object JsRoutes extends Controller {
 
@@ -11,7 +12,9 @@ object JsRoutes extends Controller {
       Routes.javascriptRouter("routes")(
         routes.javascript.Assets.at,
         routes.javascript.Security.login,
-        routes.javascript.DocumentApi.list
+        routes.javascript.DocumentApi.list,
+        routes.javascript.DocumentApi.item,
+        routes.javascript.DocumentApi.delete
       )
     ).as("text/javascript")
   }

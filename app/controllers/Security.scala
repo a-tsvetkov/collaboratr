@@ -31,7 +31,7 @@ object Security extends Controller {
       "password" -> nonEmptyText(8, 100),
       "p2" -> nonEmptyText(8, 100)
     )(UserRegistrationData.apply)(UserRegistrationData.unapply) verifying (
-      "Password must match!",
+      "Passwords must match!",
       _ match {
         case data: UserRegistrationData => validateRegistrationForm(data.email, data.password, data.p2).isDefined
       }

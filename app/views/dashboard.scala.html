@@ -1,35 +1,36 @@
 @(message: String)
 
 @main("Dashboard") {
-    <div class="col-sm-2 col-md-2" id="sidebar">
-        <ul class="nav nav-list bs-docs-sidenav collapse navbar-collapse">
-            <li>
-                <a href="index.html"><i class="icon-chevron-right"></i> Dashboard</a>
-            </li>
-            <li>
-                <a href="calendar.html"><i class="icon-chevron-right"></i> Calendar</a>
-            </li>
-            <li>
-                <a href="#"><span class="badge badge-warning pull-right">4,231</span> Logs</a>
-            </li>
-        </ul>
-    </div>
-    <!--/span-->
+    <div id="dashboard">
+        <div class="col-sm-2 col-md-2" id="sidebar">
+            <ul class="nav nav-list bs-docs-sidenav collapse navbar-collapse" data-bind="foreach: documentList">
+                <li data-bind="css: {active: $root.document.id == id}">
+                    <a href="#" data-bind="text: shortTitle(), click: $root.selectDocument"></a><i class="icon-chevron-right"></i>
+                </li>
+            </ul>
+        </div>
+        <!--/span-->
 
-    <div class="col-sm-10 col-md-10">
-        <div class="row">
-            <div class="col-sm-12 col-md-12" id="content">
-                <div class="row">
-                    <!-- block -->
-                    <div class="panel panel-default">
-                        <div class="navbar panel-heading navbar-default">
-                            <div class="pull-left text-muted">CKEditor Standard</div>
+        <div class="col-sm-10 col-md-10" data-bind="with: document">
+            <div class="row">
+                <div class="col-sm-12 col-md-12" id="content">
+                    <div class="row">
+                        <!-- block -->
+                        <div class="panel panel-default">
+                            <div class="panel-heading navbar-default">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" data-bind="value: title">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-danger" data-bind="click: $root.deleteDocument">Delete</button>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <textarea id="documnent_editor" class="form-control" rows="30" data-bind="value: body"></textarea>
+                            </div>
                         </div>
-                        <div class="panel-body">
-                            <textarea id="ckeditor_standard"></textarea>
-                        </div>
+                        <!-- /block -->
                     </div>
-                    <!-- /block -->
                 </div>
             </div>
         </div>

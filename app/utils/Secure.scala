@@ -1,8 +1,9 @@
-package controllers
+package utils
 
 import scala.concurrent._, ExecutionContext.Implicits.global
 import play.api._, mvc._
 import models.User
+import controllers._
 
 class AuthenticatedRequest[A](
   val user: User,

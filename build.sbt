@@ -21,6 +21,7 @@ libraryDependencies ++= Seq(
   // Webjars libs
   "org.webjars" % "bootstrap" % "3.0.2",
   "org.webjars" % "knockout" % "3.0.0",
+  "org.webjars" % "sammy" % "0.7.4",
   "org.webjars" % "jquery" % "2.0.3-1",
   "org.webjars" % "codemirror" % "3.20"
 )

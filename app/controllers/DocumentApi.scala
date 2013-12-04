@@ -3,6 +3,7 @@ package controllers
 import scala.concurrent._, ExecutionContext.Implicits.global
 import play.api._, mvc._, libs.json._
 import play.api.data._, Forms._, validation.Constraints._
+import utils.Secure
 import models._
 
 object DocumentApi extends Controller with Secure {
@@ -18,9 +19,17 @@ object DocumentApi extends Controller with Secure {
       Ok(
         Json.obj(
           "count" -> documents.length,
-          "items" -> Json.arr(documents)
+          "items" -> documents
         )
       )
+    }
+  }
+
+  def item(id: Long) = SecuredAction.async { implicit request =>
+    Document.getById(id) map {
+      _.map { document =>
+        Ok(Json.toJson(document))
+      }.getOrElse(NotFound("No document with id " + id))
     }
   }
 
@@ -31,5 +40,14 @@ object DocumentApi extends Controller with Secure {
         Created(Json.toJson(document))
       }
     )
+  }
+
+  def delete(id: Long) = SecuredAction.async { implicit request =>
+    Document.remove(id, request.user.id) map {
+      _ match{
+        case 1 => NoContent
+        case 0 => Forbidden("Access Denied")
+      }
+    }
   }
 }
