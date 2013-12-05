@@ -3,6 +3,11 @@
 @main("Dashboard") {
     <div id="dashboard">
         <div class="col-sm-2 col-md-2" id="sidebar">
+            <div class="bs-docs-sidenav">
+                <button type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#create-form">
+                    Create
+                </button>
+            </div>
             <ul class="nav nav-list bs-docs-sidenav collapse navbar-collapse" data-bind="foreach: documentList">
                 <li data-bind="css: {active: $root.document.id == id}">
                     <a href="#" data-bind="text: shortTitle(), click: $root.selectDocument"></a><i class="icon-chevron-right"></i>
@@ -10,6 +15,27 @@
             </ul>
         </div>
         <!--/span-->
+        <div class="modal fade" id="create-form">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Create document</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="document-title">Document title</label>
+                            <input type="email" class="form-control" id="document-title" placeholder="Choose a title..." data-bind="value: newDocumentTitle">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-success" data-bind="click: createDocument">Create</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div>
+
 
         <div class="col-sm-10 col-md-10" data-bind="with: document">
             <div class="row">
@@ -21,12 +47,16 @@
                                 <div class="input-group">
                                     <input type="text" class="form-control" data-bind="value: title">
                                     <span class="input-group-btn">
-                                        <button class="btn btn-danger" data-bind="click: $root.deleteDocument">Delete</button>
+                                        <button class="btn btn-danger" data-toggle="modal" data-target="#delete-confirm">Delete</button>
                                     </span>
+                                </div>
+                                <div>
+                                    <select id="editor-select" class="chosen-select" multiple="true" data-placeholder="Add editors..." tabindex="3">
+                                    </select>
                                 </div>
                             </div>
                             <div class="panel-body">
-                                <textarea id="documnent_editor" class="form-control" rows="30" data-bind="value: body"></textarea>
+                                <textarea id="documnent-editor" class="form-control" rows="30" data-bind="value: body"></textarea>
                             </div>
                         </div>
                         <!-- /block -->
@@ -34,6 +64,24 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="delete-confirm">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Delete document?</h4>
+                    </div>
+                    <div class="modal-body" data-bind="with: document()">
+                        <p>Are you sure you want to delete document "<span data-bind="text: title"></span>"?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-danger" data-bind="click: deleteDocument">Delete</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div>
+
     </div>
 
 }

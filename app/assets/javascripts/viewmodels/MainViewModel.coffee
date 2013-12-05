@@ -1,11 +1,13 @@
 define 'viewmodels/MainViewModel',
-    ["webjars!knockout.js", "webjars!sammy.js", "models/Document"],
-    (ko, Sammy, Document) ->
+    ["webjars!knockout.js", "webjars!sammy.js", "jquery", "models/Document"],
+    (ko, Sammy, $, Document) ->
         class MainViewModel
             constructor: () ->
                 self = @
                 @document = ko.observable()
                 @documentList = ko.observableArray()
+
+                @newDocumentTitle = ko.observable()
 
                 @getDocuments()
 
@@ -17,6 +19,8 @@ define 'viewmodels/MainViewModel',
 
                 router.run()
 
+                $('.chosen-select').chosen()
+
             getDocuments: () ->
                 Document.getList (data) =>
                     @documentList(new Document(item) for item in data.items)
@@ -25,9 +29,18 @@ define 'viewmodels/MainViewModel',
                 Document.get id, (data) =>
                     @document(new Document(data))
 
-            deleteDocument: (document) ->
-                document.delete (data) =>
-                    @documentList.remove(document)
+            createDocument: () ->
+                Document.create @newDocumentTitle, (data) =>
+                    $("#create-form").modal('hide')
+                    @newDocumentTitle('')
+                    document = new Document(data)
+                    @documentList.unshift(document)
+                    @selectDocument(document)
+
+            deleteDocument: (context) ->
+                Document.remove @document(), (data) =>
+                    $("#delete-confirm").modal('hide')
+                    @documentList.remove((item) => item.id() == @document().id())
                     @selectFirstDocument()
 
             selectDocument: (document) ->
@@ -39,4 +52,4 @@ define 'viewmodels/MainViewModel',
                         @selectDocument(documents[0])
                         subscription.dispose()
                 else
-                    @selectDocument(documents[0])
+                    @selectDocument(@documentList()[0])

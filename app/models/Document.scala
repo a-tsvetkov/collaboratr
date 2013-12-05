@@ -22,11 +22,6 @@ object Document extends SQLSyntaxSupport[Document] with ShortenedNames {
 
   override val tableName = "document"
   override val columns = Seq("id", "title", "body", "owner_id", "created_at", "updated_at")
-  override val nameConverters = Map(
-    "ownerId" -> "owner_id",
-    "createdAt" -> "created_at",
-    "updatedAt" -> "updated_at"
-  )
 
   def fromResultSet(d: ResultName[Document])(rs: WrappedResultSet): Document = new Document(
     id = rs.long(d.id),
@@ -38,7 +33,12 @@ object Document extends SQLSyntaxSupport[Document] with ShortenedNames {
   )
   def fromResultSet(d: SyntaxProvider[Document])(rs: WrappedResultSet): Document = fromResultSet(d.resultName)(rs)
 
-  val (d, u) = (Document.syntax("d"), User.syntax("u"))
+  def fromResultSet(d: SyntaxProvider[Document], u: SyntaxProvider[User])(rs: WrappedResultSet): Document = {
+    fromResultSet(d.resultName)(rs).copy(owner = Some(User.fromResultSet(u)(rs)))
+  }
+
+  val d = Document.syntax("d")
+  private val (u, e, du) = (User.syntax("u"), User.syntax("e"), DocumentUser.syntax("du"))
 
   def getById(id: Long)(
     implicit session: AsyncDBSession = AsyncDB.sharedSession,
@@ -46,10 +46,12 @@ object Document extends SQLSyntaxSupport[Document] with ShortenedNames {
     withSQL {
       select.from(Document as d)
         .leftJoin(User as u).on(d.ownerId, u.id)
+        .leftJoin(DocumentUser as du).on(du.documentId, d.id)
+        .leftJoin(User as e).on(e.id, du.userId)
         .where.eq(d.id, id)
-    }.one(Document.fromResultSet(d))
-      .toOptionalOne(User.fromResultSetOpt(u))
-      .map((document, user) => document.copy(owner=Some(user)))
+    }.one(Document.fromResultSet(d, u))
+      .toMany(User.fromResultSetOpt(e))
+      .map((document, editors) => document.copy(editors=editors))
       .single.future
   }
 

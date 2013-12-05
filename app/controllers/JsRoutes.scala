@@ -14,6 +14,7 @@ object JsRoutes extends Controller {
         routes.javascript.Security.login,
         routes.javascript.DocumentApi.list,
         routes.javascript.DocumentApi.item,
+        routes.javascript.DocumentApi.create,
         routes.javascript.DocumentApi.delete
       )
     ).as("text/javascript")

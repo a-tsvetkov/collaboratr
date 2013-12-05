@@ -41,11 +41,6 @@ object User extends SQLSyntaxSupport[User] with ShortenedNames {
 
   override val tableName = "users"
   override val columns = Seq("id", "email", "password", "salt", "first_name", "last_name", "date_joined")
-  override val nameConverters = Map(
-    "firstName" -> "first_name",
-    "lastName" -> "last_name",
-    "dateJoined" -> "date_joined"
-  )
 
   def fromResultSet(u: ResultName[User])(rs: WrappedResultSet): User = new User(
     id = rs.long(u.id),
