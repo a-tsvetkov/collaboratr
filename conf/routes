@@ -23,6 +23,11 @@ POST    /api/document               controllers.DocumentApi.create
 GET     /api/document/:id           controllers.DocumentApi.item(id: Long)
 DELETE  /api/document/:id           controllers.DocumentApi.delete(id: Long)
 
+# User API
+GET     /api/user/me                controllers.UserApi.me
+PUT     /api/user/me                controllers.UserApi.updateInfo
+
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
 

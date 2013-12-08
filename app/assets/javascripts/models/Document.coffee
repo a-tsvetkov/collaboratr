@@ -15,20 +15,19 @@ define 'models/Document',
                     if @title().length > size then @title().substring(0, size).trim() + '...'  else @title
 
             @getList: (callback) ->
-                $.get jsRoutes.controllers.DocumentApi.list().url, callback
+                $.ajax(jsRoutes.controllers.DocumentApi.list().url).done(callback)
 
             @get: (id, callback) ->
-                $.get jsRoutes.controllers.DocumentApi.item(id).url, callback
+                $.ajax(jsRoutes.controllers.DocumentApi.item(id)).done(callback)
 
             @remove: (item, callback) ->
-                $.ajax jsRoutes.controllers.DocumentApi.delete(item.id()).url,
-                    type: 'DELETE'
-                    dataType: 'json'
-                    success: callback
+                $.ajax(jsRoutes.controllers.DocumentApi.delete(item.id())).done(callback)
 
             @create: (title, callback) ->
-                $.ajax jsRoutes.controllers.DocumentApi.create().url,
-                    type: 'POST'
+                r = jsRoutes.controllers.DocumentApi.create()
+                $.ajax
+                    url: r.url
+                    type: r.type
                     contentType: 'application/json'
                     dataType: 'json'
                     data: JSON.stringify

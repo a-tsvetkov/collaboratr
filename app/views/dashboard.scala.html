@@ -50,10 +50,6 @@
                                         <button class="btn btn-danger" data-toggle="modal" data-target="#delete-confirm">Delete</button>
                                     </span>
                                 </div>
-                                <div>
-                                    <select id="editor-select" class="chosen-select" multiple="true" data-placeholder="Add editors..." tabindex="3">
-                                    </select>
-                                </div>
                             </div>
                             <div class="panel-body">
                                 <textarea id="documnent-editor" class="form-control" rows="30" data-bind="value: body"></textarea>
@@ -81,7 +77,48 @@
                 </div><!-- /.modal-content -->
             </div><!-- /.modal-dialog -->
         </div>
-
     </div>
-
+    <div class="modal fade" id="profile-edit">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Edit profile</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="document-title">First name</label>
+                        <input type="email" class="form-control" id="profile-firstname" data-bind="value: user().firstName">
+                    </div>
+                    <div class="form-group">
+                        <label for="document-title">Last name</label>
+                        <input type="email" class="form-control" id="profile-lasname" data-bind="value: user().lastName">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" data-bind="click: updateUserInfo">Update</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div>
+} {
+    <ul class="nav pull-right navbar-nav">
+        <li class="dropdown">
+            <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">
+                <i class="icon-user"></i>
+                <span data-bind="text: user().displayName()"></span>
+                <i class="caret"></i>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                    <a tabindex="-1" href="#" data-toggle="modal" data-target="#profile-edit">Edit profile</a>
+                </li>
+                <li class="divider"></li>
+                <li>
+                    <a tabindex="-1" href="@routes.Security.logout">Logout</a>
+                </li>
+            </ul>
+        </li>
+    </ul>
 }

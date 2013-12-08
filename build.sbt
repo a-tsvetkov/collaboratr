@@ -15,7 +15,7 @@ libraryDependencies ++= Seq(
   "postgresql" % "postgresql" % "9.1-901.jdbc4",
   "com.github.mauricio" %% "postgresql-async" % "0.2.8",
   // Logging
-  "org.slf4j"%  "slf4j-simple" % "[1.7,)",
+  "ch.qos.logback"  %  "logback-classic"           % "[1.0,)",
   // Webjars
   "org.webjars" %% "webjars-play" % "2.2.0",
   // Webjars libs

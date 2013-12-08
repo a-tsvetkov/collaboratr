@@ -1,15 +1,16 @@
 define 'viewmodels/MainViewModel',
-    ["webjars!knockout.js", "webjars!sammy.js", "jquery", "models/Document"],
-    (ko, Sammy, $, Document) ->
+    ["webjars!knockout.js", "webjars!sammy.js", "jquery", "models/Document", "models/User"],
+    (ko, Sammy, $, Document, User) ->
         class MainViewModel
             constructor: () ->
                 self = @
                 @document = ko.observable()
                 @documentList = ko.observableArray()
-
+                @getDocuments()
                 @newDocumentTitle = ko.observable()
 
-                @getDocuments()
+                @user = ko.observable(new User({}))
+                @getCurrentUser()
 
                 router = Sammy () ->
                     @get "/", () ->
@@ -20,6 +21,15 @@ define 'viewmodels/MainViewModel',
                 router.run()
 
                 $('.chosen-select').chosen()
+
+            updateUserInfo: () ->
+                User.updateInfo @user().firstName(), @user().lastName(), (data) =>
+                    $('#profile-edit').modal('hide')
+                    @user(new User(data))
+
+            getCurrentUser: () ->
+                User.getCurrentUser (data) =>
+                    @user(new User(data))
 
             getDocuments: () ->
                 Document.getList (data) =>

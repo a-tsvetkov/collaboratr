@@ -81,27 +81,79 @@ object User extends SQLSyntaxSupport[User] with ShortenedNames {
     getByEmail(email) map {_.filter {_.checkPassword(password)}}
   }
 
-  def create(email:String, password:String)(
+  def create(
+    email: String,
+    password:String,
+    salt: String,
+    firstName: Option[String] = None,
+    lastName: Option[String] = None,
+    dateJoined: DateTime)(
     implicit session: AsyncDBSession = AsyncDB.sharedSession,
     ctx: EC = ECGlobal): Future[User] = {
-    val salt = generateSalt
-    val passwordHash = password.bcrypt(salt)
-    val dateJoined = DateTime.now()
     withSQL {
       insert.into(User).namedValues(
         column.email -> email,
-        column.password -> passwordHash,
+        column.password -> password,
         column.salt -> salt,
+        column.firstName -> firstName,
+        column.lastName -> lastName,
         column.dateJoined -> dateJoined
       ).returningId
     }.updateAndReturnGeneratedKey.future map { id =>
       new User(
         id = id,
         email = email,
-        password = passwordHash,
+        password = password,
         salt = salt,
+        firstName = firstName,
+        lastName = lastName,
         dateJoined = dateJoined
       )
+    }
+  }
+
+  def createByEmailAndPassword(email:String, passwordPlain:String)(
+    implicit session: AsyncDBSession = AsyncDB.sharedSession,
+    ctx: EC = ECGlobal): Future[User] = {
+    val salt = generateSalt
+    val passwordHash = passwordPlain.bcrypt(salt)
+    val dateJoined = DateTime.now()
+
+    create(
+      email = email,
+      password = passwordHash,
+      salt = salt,
+      dateJoined = dateJoined
+    )
+  }
+
+  def save(user: User)(
+    implicit session: AsyncDBSession = AsyncDB.sharedSession,
+    ctx: EC = ECGlobal): Future[User] = {
+    withSQL {
+      update(User).set(
+        User.column.email -> user.email,
+        User.column.password -> user.password,
+        User.column.salt -> user.salt,
+        User.column.firstName -> user.firstName,
+        User.column.lastName -> user.lastName,
+        User.column.dateJoined -> user.dateJoined
+      ).where.eq(User.column.id, user.id)
+    }.update.future map { _ =>
+      user
+    }
+  }
+
+  def updateInfo(user: User, firstName: String, lastName: String)(
+    implicit session: AsyncDBSession = AsyncDB.sharedSession,
+    ctx: EC = ECGlobal): Future[User] = {
+    withSQL {
+      update(User).set(
+        User.column.firstName -> firstName,
+        User.column.lastName -> lastName
+      ).where.eq(User.column.id, user.id)
+    }.update.future map { _ =>
+      user.copy(firstName = Some(firstName), lastName = Some(lastName))
     }
   }
 }

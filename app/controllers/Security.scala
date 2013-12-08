@@ -73,7 +73,7 @@ object Security extends Controller {
       registrationData => User.getByEmail(registrationData.email) flatMap {
         _ match {
           case Some(u) => Future.successful(Conflict(views.html.register(boundForm)))
-          case None => User.create(registrationData.email, registrationData.password) map {
+          case None => User.createByEmailAndPassword(registrationData.email, registrationData.password) map {
             loginUser(_)
           }
         }
