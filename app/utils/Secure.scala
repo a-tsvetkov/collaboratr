@@ -16,13 +16,19 @@ trait Secure {
   object SecuredAction extends ActionBuilder[AuthenticatedRequest] {
 
     def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[SimpleResult]) = {
-      request.session.get("user_id").map { userId: String =>
-        User.getById(userId.toLong) flatMap {
+      getUser(request) flatMap {
           _.map { user: User =>
             block(new AuthenticatedRequest(user, request))
-          }.getOrElse(Future.successful(Unauthorized("Malformed user session")))
-        }
-      }.getOrElse(Future.successful(Redirect(routes.Security.login)))
+          }.getOrElse(notAuthenticated)
+      }
+    }
+
+    def getUser[A](request: Request[A]): Future[Option[User]] = {
+      request.session.get("user_id").map { userId: String =>
+        User.getById(userId.toLong)
+      }.getOrElse(Future.successful(None))
     }
   }
+
+  def notAuthenticated = Future.successful(Redirect(routes.Security.login))
 }

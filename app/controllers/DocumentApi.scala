@@ -50,4 +50,6 @@ object DocumentApi extends Controller with Secure {
       }
     }
   }
+
+  def update = TODO
 }
