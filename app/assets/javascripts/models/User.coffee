@@ -22,12 +22,12 @@ define 'models/User',
                 @displayName = ko.computed () =>
                     if @fullName() then "#{@fullName()} (#{@email()})" else @email()
 
-            @getCurrentUser: (callback) ->
-                $.ajax(jsRoutes.controllers.UserApi.me()).done(callback)
+            @getCurrentUser: () ->
+                $.ajax(jsRoutes.controllers.UserApi.me()).then((data) -> new User(data)).promise()
 
-            @updateInfo: (firstName, lastName, callback) ->
+            @updateInfo: (firstName, lastName) ->
                 r = jsRoutes.controllers.UserApi.updateInfo()
-                $.ajax
+                $.ajax(
                     url: r.url
                     type: r.type
                     contentType: 'application/json'
@@ -35,4 +35,5 @@ define 'models/User',
                     data: JSON.stringify
                         firstName: firstName
                         lastName: lastName
-                    success: callback
+                    ).then((data) -> new User(data))
+                    .promise()

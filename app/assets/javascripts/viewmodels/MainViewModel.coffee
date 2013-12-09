@@ -4,13 +4,15 @@ define 'viewmodels/MainViewModel',
         class MainViewModel
             constructor: () ->
                 self = @
+                @user = ko.observable()
+                @getCurrentUser()
+
                 @document = ko.observable()
                 @documentList = ko.observableArray()
                 @getDocuments()
+
                 @newDocumentTitle = ko.observable()
 
-                @user = ko.observable(new User({}))
-                @getCurrentUser()
 
                 router = Sammy () ->
                     @get "/", () ->
@@ -23,38 +25,33 @@ define 'viewmodels/MainViewModel',
                 $('.chosen-select').chosen()
 
             updateUserInfo: () ->
-                User.updateInfo @user().firstName(), @user().lastName(), (data) =>
+                User.updateInfo(@user().firstName(), @user().lastName()).done (user) =>
+                    @user(user)
                     $('#profile-edit').modal('hide')
-                    @user(new User(data))
 
             getCurrentUser: () ->
-                User.getCurrentUser (data) =>
-                    @user(new User(data))
+                User.getCurrentUser().done @user
 
             getDocuments: () ->
-                Document.getList (data) =>
-                    @documentList(new Document(item) for item in data.items)
+                Document.getList().done @documentList
 
             getDocument: (id) ->
-                Document.get id, (data) =>
-                    @document(new Document(data))
+                Document.get(id).done @document
 
             createDocument: () ->
-                Document.create @newDocumentTitle, (data) =>
+                Document.create(@newDocumentTitle).done (document) =>
                     $("#create-form").modal('hide')
                     @newDocumentTitle('')
-                    document = new Document(data)
                     @documentList.unshift(document)
                     @selectDocument(document)
 
             deleteDocument: (context) ->
-                Document.remove @document(), (data) =>
+                Document.remove(@document()).done (data) =>
                     $("#delete-confirm").modal('hide')
                     @documentList.remove((item) => item.id() == @document().id())
                     @selectFirstDocument()
 
-            selectDocument: (document) ->
-                location.hash = "/" + document.id()
+            selectDocument: (document) -> location.hash = "/" + document.id()
 
             selectFirstDocument: () ->
                 if @documentList().length == 0

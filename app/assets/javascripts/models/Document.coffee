@@ -14,22 +14,27 @@ define 'models/Document',
                     size = 30
                     if @title().length > size then @title().substring(0, size).trim() + '...'  else @title
 
-            @getList: (callback) ->
-                $.ajax(jsRoutes.controllers.DocumentApi.list().url).done(callback)
+            @getList: () ->
+                $.ajax(jsRoutes.controllers.DocumentApi.list())
+                    .then((data) -> new Document(item) for item in data.items)
+                    .promise()
 
             @get: (id, callback) ->
-                $.ajax(jsRoutes.controllers.DocumentApi.item(id)).done(callback)
+                $.ajax(jsRoutes.controllers.DocumentApi.item(id))
+                    .then((data) -> new Document(data))
+                    .promise()
 
-            @remove: (item, callback) ->
-                $.ajax(jsRoutes.controllers.DocumentApi.delete(item.id())).done(callback)
+            @remove: (item) ->
+                $.ajax(jsRoutes.controllers.DocumentApi.delete(item.id())).promise()
 
-            @create: (title, callback) ->
+            @create: (title) ->
                 r = jsRoutes.controllers.DocumentApi.create()
-                $.ajax
+                $.ajax(
                     url: r.url
                     type: r.type
                     contentType: 'application/json'
                     dataType: 'json'
                     data: JSON.stringify
                         title: title()
-                    success: callback
+                ).then((data) -> new Document(data))
+                .promise()

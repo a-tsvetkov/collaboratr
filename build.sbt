@@ -23,6 +23,8 @@ libraryDependencies ++= Seq(
   "org.webjars" % "knockout" % "3.0.0",
   "org.webjars" % "sammy" % "0.7.4",
   "org.webjars" % "jquery" % "2.0.3-1",
+  "org.webjars" % "underscorejs" % "1.5.2",
+  "org.webjars" % "underscore.string" % "2.3.0",
   "org.webjars" % "chosen" % "0.9.12",
   "org.webjars" % "momentjs" % "2.4.0",
   "org.webjars" % "codemirror" % "3.20"
