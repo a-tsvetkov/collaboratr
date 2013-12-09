@@ -8,10 +8,8 @@
                     Create
                 </button>
             </div>
-            <ul class="nav nav-list bs-docs-sidenav collapse navbar-collapse" data-bind="foreach: documentList">
-                <li data-bind="css: {active: $root.document.id == id}">
-                    <a href="#" data-bind="text: shortTitle(), click: $root.selectDocument"></a><i class="icon-chevron-right"></i>
-                </li>
+            <ul class="nav nav-list bs-docs-sidenav collapse navbar-collapse list-group" data-bind="foreach: documentList">
+                <a href="#" class="list-group-item" data-bind="text: shortTitle(), click: $root.selectDocument, css: {active: $root.document().id() == id()}"></a><i class="icon-chevron-right"></i>
             </ul>
         </div>
         <!--/span-->
@@ -94,7 +92,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal" data-bind="click: getCurrentUser">Cancel</button>
                     <button type="button" class="btn btn-primary" data-bind="click: updateUserInfo">Update</button>
                 </div>
             </div><!-- /.modal-content -->

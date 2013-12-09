@@ -11,7 +11,7 @@ define 'models/Document',
                 @updated_at = ko.observable(data.updated_at)
 
                 @shortTitle = ko.computed () =>
-                    size = 25
+                    size = 30
                     if @title().length > size then @title().substring(0, size).trim() + '...'  else @title
 
             @getList: (callback) ->
