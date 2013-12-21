@@ -13,9 +13,8 @@ case class User(
   password: String,
   salt: String,
   firstName: Option[String] = None,
-  lastName: Option[String]= None,
-  dateJoined: DateTime
-) {
+  lastName: Option[String] = None,
+  dateJoined: DateTime) {
 
   def checkPassword(plainPassword: String): Boolean = {
     plainPassword.bcrypt(salt) == password
@@ -32,8 +31,7 @@ object User extends SQLSyntaxSupport[User] with ShortenedNames {
         "email" -> u.email,
         "firstName" -> u.firstName,
         "lastName" -> u.lastName,
-        "dateJoined" -> u.dateJoined
-      )
+        "dateJoined" -> u.dateJoined)
     }
   }
 
@@ -49,8 +47,7 @@ object User extends SQLSyntaxSupport[User] with ShortenedNames {
     salt = rs.string(u.salt),
     firstName = rs.stringOpt(u.firstName),
     lastName = rs.stringOpt(u.lastName),
-    dateJoined = rs.timestamp(u.dateJoined).toDateTime
-  )
+    dateJoined = rs.timestamp(u.dateJoined).toDateTime)
   def fromResultSet(u: SyntaxProvider[User])(rs: WrappedResultSet): User = fromResultSet(u.resultName)(rs)
 
   def fromResultSetOpt(u: SyntaxProvider[User])(rs: WrappedResultSet): Option[User] = {
@@ -78,18 +75,18 @@ object User extends SQLSyntaxSupport[User] with ShortenedNames {
   def authenticate(email: String, password: String)(
     implicit session: AsyncDBSession = AsyncDB.sharedSession,
     ctx: EC = ECGlobal): Future[Option[User]] = {
-    getByEmail(email) map {_.filter {_.checkPassword(password)}}
+    getByEmail(email) map { _.filter { _.checkPassword(password) } }
   }
 
   def create(
     email: String,
-    password:String,
+    password: String,
     salt: String,
     firstName: Option[String] = None,
     lastName: Option[String] = None,
     dateJoined: DateTime)(
-    implicit session: AsyncDBSession = AsyncDB.sharedSession,
-    ctx: EC = ECGlobal): Future[User] = {
+      implicit session: AsyncDBSession = AsyncDB.sharedSession,
+      ctx: EC = ECGlobal): Future[User] = {
     withSQL {
       insert.into(User).namedValues(
         column.email -> email,
@@ -97,8 +94,7 @@ object User extends SQLSyntaxSupport[User] with ShortenedNames {
         column.salt -> salt,
         column.firstName -> firstName,
         column.lastName -> lastName,
-        column.dateJoined -> dateJoined
-      ).returningId
+        column.dateJoined -> dateJoined).returningId
     }.updateAndReturnGeneratedKey.future map { id =>
       new User(
         id = id,
@@ -107,12 +103,11 @@ object User extends SQLSyntaxSupport[User] with ShortenedNames {
         salt = salt,
         firstName = firstName,
         lastName = lastName,
-        dateJoined = dateJoined
-      )
+        dateJoined = dateJoined)
     }
   }
 
-  def createByEmailAndPassword(email:String, passwordPlain:String)(
+  def createByEmailAndPassword(email: String, passwordPlain: String)(
     implicit session: AsyncDBSession = AsyncDB.sharedSession,
     ctx: EC = ECGlobal): Future[User] = {
     val salt = generateSalt
@@ -123,8 +118,7 @@ object User extends SQLSyntaxSupport[User] with ShortenedNames {
       email = email,
       password = passwordHash,
       salt = salt,
-      dateJoined = dateJoined
-    )
+      dateJoined = dateJoined)
   }
 
   def save(user: User)(
@@ -137,8 +131,7 @@ object User extends SQLSyntaxSupport[User] with ShortenedNames {
         User.column.salt -> user.salt,
         User.column.firstName -> user.firstName,
         User.column.lastName -> user.lastName,
-        User.column.dateJoined -> user.dateJoined
-      ).where.eq(User.column.id, user.id)
+        User.column.dateJoined -> user.dateJoined).where.eq(User.column.id, user.id)
     }.update.future map { _ =>
       user
     }
@@ -150,8 +143,7 @@ object User extends SQLSyntaxSupport[User] with ShortenedNames {
     withSQL {
       update(User).set(
         User.column.firstName -> firstName,
-        User.column.lastName -> lastName
-      ).where.eq(User.column.id, user.id)
+        User.column.lastName -> lastName).where.eq(User.column.id, user.id)
     }.update.future map { _ =>
       user.copy(firstName = Some(firstName), lastName = Some(lastName))
     }

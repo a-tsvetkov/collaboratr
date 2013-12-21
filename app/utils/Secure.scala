@@ -7,8 +7,7 @@ import controllers._
 
 class AuthenticatedRequest[A](
   val user: User,
-  request: Request[A]
-) extends WrappedRequest[A](request)
+  request: Request[A]) extends WrappedRequest[A](request)
 
 trait Secure {
   self: Controller =>
@@ -17,9 +16,9 @@ trait Secure {
 
     def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[SimpleResult]) = {
       getUser(request) flatMap {
-          _.map { user: User =>
-            block(new AuthenticatedRequest(user, request))
-          }.getOrElse(notAuthenticated)
+        _.map { user: User =>
+          block(new AuthenticatedRequest(user, request))
+        }.getOrElse(notAuthenticated)
       }
     }
 

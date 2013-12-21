@@ -14,9 +14,7 @@ object UserApi extends Controller with Secure {
   val userInfoForm = Form(
     mapping(
       "firstName" -> text,
-      "lastName" -> text
-    )(UserInfoData.apply)(UserInfoData.unapply)
-  )
+      "lastName" -> text)(UserInfoData.apply)(UserInfoData.unapply))
 
   def me = SecuredAction { implicit request =>
     Ok(Json.toJson(request.user))
@@ -27,7 +25,6 @@ object UserApi extends Controller with Secure {
       formWithErrors => Future.successful(BadRequest(formWithErrors.errorsAsJson)),
       userInfo => User.updateInfo(request.user, userInfo.firstName, userInfo.lastName).map { user =>
         Ok(Json.toJson(user))
-      }
-    )
+      })
   }
 }

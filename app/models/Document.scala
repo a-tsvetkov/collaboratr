@@ -13,8 +13,7 @@ case class Document(
   owner: Option[User] = None,
   editors: Seq[User] = Seq(),
   createdAt: DateTime,
-  updatedAt: DateTime
-)
+  updatedAt: DateTime)
 
 object Document extends SQLSyntaxSupport[Document] with ShortenedNames {
 
@@ -29,8 +28,7 @@ object Document extends SQLSyntaxSupport[Document] with ShortenedNames {
     body = rs.string(d.body),
     ownerId = rs.long(d.ownerId),
     createdAt = rs.timestamp(d.createdAt).toDateTime,
-    updatedAt = rs.timestamp(d.updatedAt).toDateTime
-  )
+    updatedAt = rs.timestamp(d.updatedAt).toDateTime)
   def fromResultSet(d: SyntaxProvider[Document])(rs: WrappedResultSet): Document = fromResultSet(d.resultName)(rs)
 
   def fromResultSet(d: SyntaxProvider[Document], u: SyntaxProvider[User])(rs: WrappedResultSet): Document = {
@@ -51,7 +49,7 @@ object Document extends SQLSyntaxSupport[Document] with ShortenedNames {
         .where.eq(d.id, id)
     }.one(Document.fromResultSet(d, u))
       .toMany(User.fromResultSetOpt(e))
-      .map((document, editors) => document.copy(editors=editors))
+      .map((document, editors) => document.copy(editors = editors))
       .single.future
   }
 
@@ -74,8 +72,7 @@ object Document extends SQLSyntaxSupport[Document] with ShortenedNames {
         column.title -> title,
         column.ownerId -> owner.id,
         column.createdAt -> createdAt,
-        column.updatedAt -> createdAt
-      ).returningId
+        column.updatedAt -> createdAt).returningId
     }.updateAndReturnGeneratedKey.future map { id =>
       new Document(
         id = id,
@@ -84,8 +81,7 @@ object Document extends SQLSyntaxSupport[Document] with ShortenedNames {
         ownerId = owner.id,
         owner = Some(owner),
         createdAt = createdAt,
-        updatedAt = createdAt
-      )
+        updatedAt = createdAt)
     }
   }
 

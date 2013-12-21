@@ -13,9 +13,7 @@ object Security extends Controller {
   val loginForm = Form(
     mapping(
       "email" -> email,
-      "password" -> nonEmptyText
-    )(UserData.apply)(UserData.unapply)
-  )
+      "password" -> nonEmptyText)(UserData.apply)(UserData.unapply))
 
   def validateRegistrationForm(email: String, password: String, p2: String) = {
     if (password == p2) {
@@ -29,14 +27,11 @@ object Security extends Controller {
     mapping(
       "email" -> email,
       "password" -> nonEmptyText(8, 100),
-      "p2" -> nonEmptyText(8, 100)
-    )(UserRegistrationData.apply)(UserRegistrationData.unapply) verifying (
-      "Passwords must match!",
-      _ match {
-        case data: UserRegistrationData => validateRegistrationForm(data.email, data.password, data.p2).isDefined
-      }
-    )
-  )
+      "p2" -> nonEmptyText(8, 100))(UserRegistrationData.apply)(UserRegistrationData.unapply) verifying (
+        "Passwords must match!",
+        _ match {
+          case data: UserRegistrationData => validateRegistrationForm(data.email, data.password, data.p2).isDefined
+        }))
 
   def loginUser(user: User)(implicit request: Request[AnyContent]) = {
     Redirect(routes.Dashboard.index).withSession(session + ("user_id" -> user.id.toString))
@@ -54,8 +49,7 @@ object Security extends Controller {
           case Some(user) => loginUser(user)
           case None => Unauthorized(views.html.login(loginForm.bind(Map("email" -> userData.email))))
         }
-      }
-    )
+      })
   }
 
   def logout = Action { implicit request =>
@@ -77,8 +71,7 @@ object Security extends Controller {
             loginUser(_)
           }
         }
-      }
-    )
+      })
   }
 
 }

@@ -10,18 +10,14 @@ object DocumentApi extends Controller with Secure {
 
   val documentForm = Form(
     single(
-      "title" -> nonEmptyText
-    )
-  )
+      "title" -> nonEmptyText))
 
   def list = SecuredAction.async { implicit request =>
     Document.getByOwnerId(request.user.id).map { documents =>
       Ok(
         Json.obj(
           "count" -> documents.length,
-          "items" -> documents
-        )
-      )
+          "items" -> documents))
     }
   }
 
@@ -38,13 +34,12 @@ object DocumentApi extends Controller with Secure {
       formWithErrors => Future.successful(BadRequest(formWithErrors.errorsAsJson)),
       title => Document.create(title, request.user) map { document =>
         Created(Json.toJson(document))
-      }
-    )
+      })
   }
 
   def delete(id: Long) = SecuredAction.async { implicit request =>
     Document.remove(id, request.user.id) map {
-      _ match{
+      _ match {
         case 1 => NoContent
         case 0 => Forbidden("Access Denied")
       }
