@@ -1,12 +1,14 @@
 package controllers
 
 import scala.concurrent._, ExecutionContext.Implicits.global
-import play.api._, mvc._, libs.json._
+import play.api._, mvc._, libs.iteratee._, libs.json._
 import play.api.data._, Forms._, validation.Constraints._
 import utils.Secure
 import models._
 
 object DocumentApi extends Controller with Secure {
+
+  val logger = Logger("application")
 
   val documentForm = Form(
     single(
@@ -46,5 +48,19 @@ object DocumentApi extends Controller with Secure {
     }
   }
 
-  def update = TODO
+  def update = WebSocket.async[JsValue] { implicit request =>
+    getUser(request).map {
+      _.map {
+        user =>
+          val in = Iteratee.foreach[JsValue] { message =>
+            logger.debug(message.toString)
+          }
+          val out = Enumerator[JsValue](Json.obj("message" -> "test"))
+
+          (in, out)
+      }.getOrElse {
+        (Iteratee.ignore, Enumerator[JsValue](Json.obj("message" -> "Forbidden")).andThen(Enumerator.eof))
+      }
+    }
+  }
 }

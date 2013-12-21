@@ -8,7 +8,7 @@
                     Create
                 </button>
             </div>
-            <div data-bind="if: documentList" >
+            <div data-bind="if: documentList && document" >
                 <ul class="nav nav-list bs-docs-sidenav collapse navbar-collapse list-group" data-bind="foreach: documentList">
                     <a href="#" class="list-group-item" data-bind="text: shortTitle(), click: $root.selectDocument, css: {active: $root.document().id() == id()}"></a><i class="icon-chevron-right"></i>
                 </ul>

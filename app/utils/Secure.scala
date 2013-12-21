@@ -15,18 +15,18 @@ trait Secure {
   object SecuredAction extends ActionBuilder[AuthenticatedRequest] {
 
     def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[SimpleResult]) = {
-      getUser(request) flatMap {
+      self.getUser(request) flatMap {
         _.map { user: User =>
           block(new AuthenticatedRequest(user, request))
         }.getOrElse(notAuthenticated)
       }
     }
+  }
 
-    def getUser[A](request: Request[A]): Future[Option[User]] = {
-      request.session.get("user_id").map { userId: String =>
-        User.getById(userId.toLong)
-      }.getOrElse(Future.successful(None))
-    }
+  def getUser(request: RequestHeader): Future[Option[User]] = {
+    request.session.get("user_id").map { userId: String =>
+      User.getById(userId.toLong)
+    }.getOrElse(Future.successful(None))
   }
 
   def notAuthenticated = Future.successful(Redirect(routes.Security.login))
