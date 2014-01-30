@@ -1,14 +1,23 @@
 package controllers
 
-import scala.concurrent._, ExecutionContext.Implicits.global
+import scala.language.postfixOps
+import scala.concurrent._, ExecutionContext.Implicits.global, duration._
 import play.api._, mvc._, libs.iteratee._, libs.json._
 import play.api.data._, Forms._, validation.Constraints._
+import akka.pattern.ask
+import akka.util.Timeout
 import utils.Secure
 import models._
+import actors._
 
 object DocumentApi extends Controller with Secure {
 
+  implicit val timeout = Timeout(1 second)
+
   val logger = Logger("application")
+
+  val updateSerializer: Enumeratee[DocumentUpdate, JsValue] =
+    Enumeratee.map[DocumentUpdate] { upd => Json.toJson(upd) }
 
   val documentForm = Form(
     single(
@@ -48,19 +57,27 @@ object DocumentApi extends Controller with Secure {
     }
   }
 
-  def update = WebSocket.async[JsValue] { implicit request =>
-    getUser(request).map {
-      _.map {
-        user =>
-          val in = Iteratee.foreach[JsValue] { message =>
-            logger.debug(message.toString)
-          }
-          val out = Enumerator[JsValue](Json.obj("message" -> "test"))
+  def update(id: Long) = WebSocket.async[JsValue] { implicit request =>
+    getUser(request).flatMap {
+      _.map { user =>
+        Document.getById(id).flatMap {
+          _.map { document =>
+            DocumentWatcher.getOrCreateForDocument(document) flatMap { watcher =>
+              (watcher ? Listen(user, document)).mapTo[Enumerator[DocumentUpdate]] map { out =>
+                val in = Iteratee.foreach[JsValue] { message =>
+                  watcher ! message.as[DocumentUpdate]
+                }
 
-          (in, out)
-      }.getOrElse {
-        (Iteratee.ignore, Enumerator[JsValue](Json.obj("message" -> "Forbidden")).andThen(Enumerator.eof))
-      }
+                (in, out &> updateSerializer)
+              }
+            }
+          }.getOrElse(Future.successful(wsError("Not Found")))
+        }
+      }.getOrElse(Future.successful(wsError("Forbidden")))
     }
+  }
+
+  def wsError(message: String) = {
+    (Iteratee.ignore[JsValue], Enumerator[JsValue](Json.obj("message" -> message)).andThen(Enumerator.eof))
   }
 }

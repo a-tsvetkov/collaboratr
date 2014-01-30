@@ -8,4 +8,6 @@ object Dashboard extends Controller with Secure {
   def index = SecuredAction {
     Ok(views.html.dashboard("Your new application is ready."))
   }
+
+  def dashboard(path: String) = index
 }

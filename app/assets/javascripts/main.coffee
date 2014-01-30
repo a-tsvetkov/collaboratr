@@ -7,13 +7,12 @@ requirejs.config
         "webjars!sammy.js":
             deps: ["jquery"]
             exports: "Sammy"
-        "webjars!chosen.jquery.js": ["jquery"]
+        "webjars!chosen.jquery.min.js": ["jquery"]
 
-
-define("jquery", ["webjars!jquery.js"], () -> $)
+define("jquery", ["webjars!jquery.min.js"], () -> $)
 define("jsRoutes", ["/routes.js"], () -> routes)
 
-require ["webjars!knockout.js", "jquery", "viewmodels/MainViewModel", "webjars!bootstrap.js", "webjars!chosen.jquery.js"],
+require ["webjars!knockout.js", "jquery", "viewmodels/MainViewModel", "webjars!bootstrap.min.js", "webjars!chosen.jquery.min.js"],
     (ko, $, MainViewModel) ->
         model = new MainViewModel()
         ko.applyBindings model

@@ -16,6 +16,7 @@ object JsRoutes extends Controller {
         routes.javascript.DocumentApi.item,
         routes.javascript.DocumentApi.create,
         routes.javascript.DocumentApi.delete,
+        routes.javascript.DocumentApi.update,
         routes.javascript.UserApi.me,
         routes.javascript.UserApi.updateInfo)).as("text/javascript")
   }

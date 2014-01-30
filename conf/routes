@@ -2,9 +2,6 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Home page
-GET     /                           controllers.Dashboard.index
-
 # Login
 GET     /login                      controllers.Security.login
 POST    /login                      controllers.Security.checkLogin
@@ -21,6 +18,7 @@ GET     /routes.js                  controllers.JsRoutes.router
 GET     /api/document               controllers.DocumentApi.list
 POST    /api/document               controllers.DocumentApi.create
 GET     /api/document/:id           controllers.DocumentApi.item(id: Long)
+GET     /api/document/:id/update    controllers.DocumentApi.update(id: Long)
 DELETE  /api/document/:id           controllers.DocumentApi.delete(id: Long)
 
 # User API
@@ -37,3 +35,7 @@ GET     /webjars/require.js             controllers.WebJarAssets.requirejs()
 
 # Enable webjar based resources to be returned
 GET     /webjars/*file              controllers.WebJarAssets.at(file)
+
+# Home page
+GET     /                           controllers.Dashboard.index
+GET     /*path                      controllers.Dashboard.dashboard(path: String)

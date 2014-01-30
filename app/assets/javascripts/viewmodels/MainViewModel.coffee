@@ -1,5 +1,5 @@
 define 'viewmodels/MainViewModel',
-    ["webjars!knockout.js", "webjars!sammy.js", "jquery", "models/Document", "models/User"],
+    ["webjars!knockout.js", "webjars!sammy.min.js", "jquery", "models/Document", "models/User"],
     (ko, Sammy, $, Document, User) ->
         class MainViewModel
             constructor: () ->
@@ -13,11 +13,10 @@ define 'viewmodels/MainViewModel',
 
                 @newDocumentTitle = ko.observable()
 
-
                 router = Sammy () ->
                     @get "/", () ->
                         self.selectFirstDocument()
-                    @get "/#/:documentId", () ->
+                    @get "/document/:documentId", () ->
                         self.getDocument(@params.documentId)
 
                 router.run()
@@ -29,14 +28,11 @@ define 'viewmodels/MainViewModel',
                     @user(user)
                     $('#profile-edit').modal('hide')
 
-            getCurrentUser: () ->
-                User.getCurrentUser().done @user
+            getCurrentUser: () -> User.getCurrentUser().done @user
 
-            getDocuments: () ->
-                Document.getList().done @documentList
+            getDocuments: () -> Document.getList().done @documentList
 
-            getDocument: (id) ->
-                Document.get(id).done @document
+            getDocument: (id) -> Document.get(id).done @document
 
             createDocument: () ->
                 Document.create(@newDocumentTitle).done (document) =>
@@ -51,7 +47,7 @@ define 'viewmodels/MainViewModel',
                     @documentList.remove((item) => item.id() == @document().id())
                     @selectFirstDocument()
 
-            selectDocument: (document) -> location.hash = "/" + document.id()
+            selectDocument: (document) -> window.history.pushState(null, null, "/document/" + document.id())
 
             selectFirstDocument: () ->
                 if @documentList().length == 0

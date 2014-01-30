@@ -53,7 +53,7 @@ object Security extends Controller {
   }
 
   def logout = Action { implicit request =>
-    Redirect(routes.Dashboard.index()).withSession(session - "user_id")
+    Redirect(routes.Dashboard.index).withSession(session - "user_id")
   }
 
   def signup = Action {
